@@ -103,3 +103,9 @@ async function shareImage() {
 
 // Auto-fetch on page load
 fetchPrice();
+
+document.querySelectorAll('.onzas-buttons button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    onzasEl.value = btn.dataset.onzas;
+  });
+});
