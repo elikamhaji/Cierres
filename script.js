@@ -106,6 +106,15 @@ fetchPrice();
 
 document.querySelectorAll('.onzas-buttons button').forEach(btn => {
   btn.addEventListener('click', () => {
-    onzasEl.value = btn.dataset.onzas;
+    const action = btn.dataset.onzas;
+    let current = onzasEl.value || '';
+
+    if (action === 'back') {
+      // Remove last digit
+      onzasEl.value = current.slice(0, -1);
+    } else {
+      // Append digit (calculator-style)
+      onzasEl.value = current + action;
+    }
   });
 });
