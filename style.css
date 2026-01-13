@@ -37,8 +37,10 @@ input[readonly]{
 }
 .btn-row{
   display:flex;
-  gap:10px;
+  gap:14px;
+  margin-top:28px;   /* 👈 THIS is the key spacing */
 }
+
 button{
   flex:1;
   padding:14px;
