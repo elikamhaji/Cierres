@@ -1,5 +1,5 @@
 const goldPriceEl = document.getElementById('goldPrice');
-const goldMinusTwoEl = document.getElementById('goldMinusTwo');
+const goldMinusTwoEl = document.getElementById('goldMinusTwo'); // internal minus-3 value
 const onzasEl = document.getElementById('onzas');
 const fetchBtn = document.getElementById('fetchBtn');
 const shareBtn = document.getElementById('shareBtn');
@@ -7,11 +7,11 @@ const shareBtn = document.getElementById('shareBtn');
 const shareCard = document.getElementById('shareCard');
 const shareText = document.getElementById('shareText');
 
-function round2(n){
+function round2(n) {
   return Math.round((n + Number.EPSILON) * 100) / 100;
 }
 
-function formatNYDateTime(){
+function formatNYDateTime() {
   const fmt = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/New_York',
     year: 'numeric',
@@ -24,52 +24,64 @@ function formatNYDateTime(){
   return fmt.format(new Date());
 }
 
-function updateMinusTwo(){
+function updateMinusThree() {
   const gp = parseFloat(goldPriceEl.value);
   if (!isFinite(gp)) {
     goldMinusTwoEl.value = '';
     return;
   }
-  const minusTwo = round2(gp - 3);
-  goldMinusTwoEl.value = minusTwo.toFixed(2);
+
+  const minusThree = round2(gp - 3);
+  goldMinusTwoEl.value = minusThree.toFixed(2);
 }
 
-goldPriceEl.addEventListener('input', updateMinusTwo);
+goldPriceEl.addEventListener('input', updateMinusThree);
 fetchBtn.addEventListener('click', fetchPrice);
 shareBtn.addEventListener('click', shareImage);
 
-async function fetchPrice(){
-  try{
+async function fetchPrice() {
+  try {
     const res = await fetch('https://api.gold-api.com/price/XAU');
     const data = await res.json();
-    if (typeof data?.price === 'number'){
+
+    if (typeof data?.price === 'number') {
       goldPriceEl.value = data.price.toFixed(2);
-      updateMinusTwo();
+      updateMinusThree();
     }
-  }catch(e){
-    console.log('fetch error', e);
+  } catch (e) {
+    console.error('Gold fetch error:', e);
   }
 }
 
-function buildShareString(){
+function buildShareData() {
   const onzas = (onzasEl.value || '').trim();
-  const minusTwo = (goldMinusTwoEl.value || '').trim();
+  const price = (goldMinusTwoEl.value || '').trim();
   const ny = formatNYDateTime();
 
-  if (!onzas) return null;
-  if (!minusTwo) return null;
+  if (!onzas || !price) return null;
 
-  return `${onzas} Onzas @ ${minusTwo} ${ny}`;
+  return {
+    line1: `${onzas} Onzas @ ${price}`,
+    line2: ny
+  };
 }
 
-async function shareImage(){
-  const text = buildShareString();
-  if (!text){
+async function shareImage() {
+  const data = buildShareData();
+  if (!data) {
     alert('Enter Onzas and fetch price first.');
     return;
   }
 
-  shareText.textContent = text;
+  // Two-line layout (clean + intentional)
+  shareText.innerHTML = `
+    <div style="font-size:42px; font-weight:700; line-height:1.2;">
+      ${data.line1}
+    </div>
+    <div style="font-size:22px; opacity:0.85; margin-top:12px;">
+      ${data.line2}
+    </div>
+  `;
 
   const canvas = await html2canvas(shareCard, { scale: 3 });
 
@@ -89,5 +101,5 @@ async function shareImage(){
   });
 }
 
-// Auto fetch on load
+// Auto-fetch on page load
 fetchPrice();
