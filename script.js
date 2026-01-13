@@ -1,5 +1,5 @@
 const goldPriceEl = document.getElementById('goldPrice');
-const goldMinusTwoEl = document.getElementById('goldMinusTwo'); // minus-3 value
+const goldMinusTwoEl = document.getElementById('goldMinusTwo'); // actually minus-3
 const onzasEl = document.getElementById('onzas');
 const fetchBtn = document.getElementById('fetchBtn');
 const shareBtn = document.getElementById('shareBtn');
@@ -45,7 +45,7 @@ async function fetchPrice() {
       updateMinusThree();
     }
   } catch (e) {
-    console.error('Gold fetch error:', e);
+    console.error('Fetch error:', e);
   }
 }
 
@@ -67,55 +67,60 @@ async function shareImage() {
     return;
   }
 
-  // FORCE EXACTLY TWO LINES — NEVER WRAP LINE 1
+  // FORCE 2-LINE LAYOUT — NO WRAPPING
   shareText.innerHTML = `
     <div style="
       font-size:40px;
       font-weight:700;
-      line-height:1.2;
       white-space:nowrap;
+      text-align:center;
     ">
       ${data.line1}
     </div>
     <div style="
       font-size:22px;
       opacity:0.85;
-      margin-top:14px;
+      margin-top:12px;
+      text-align:center;
     ">
       ${data.line2}
     </div>
   `;
 
-  const canvas = await html2canvas(shareCard, { scale: 3 });
+  const canvas = await html2canvas(shareCard, {
+    scale: 3,
+    backgroundColor: '#141414'
+  });
 
   canvas.toBlob(async (blob) => {
     if (!blob) return;
+
     const file = new File([blob], 'gold-share.png', { type: 'image/png' });
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file] });
     } else {
       const link = document.createElement('a');
-      link.href = canvas.toDataURL('image/png');
+      link.href = URL.createObjectURL(blob);
       link.download = 'gold-share.png';
       link.click();
     }
   });
 }
 
-// Auto-fetch on load
+// Auto fetch on load
 fetchPrice();
 
-/* Onzas keypad logic (calculator-style + backspace) */
+// Calculator-style Onzas buttons
 document.querySelectorAll('.onzas-buttons button').forEach(btn => {
   btn.addEventListener('click', () => {
-    const val = btn.dataset.onzas;
+    const action = btn.dataset.onzas;
     let current = onzasEl.value || '';
 
-    if (val === 'back') {
+    if (action === 'back') {
       onzasEl.value = current.slice(0, -1);
     } else {
-      onzasEl.value = current + val;
+      onzasEl.value = current + action;
     }
   });
 });
