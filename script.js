@@ -30,7 +30,7 @@ function updateMinusTwo(){
     goldMinusTwoEl.value = '';
     return;
   }
-  const minusTwo = round2(gp - 2);
+  const minusTwo = round2(gp - 3);
   goldMinusTwoEl.value = minusTwo.toFixed(2);
 }
 
