@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gold Quick Share</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="card">
+      <div class="label">Gold Price / oz</div>
+      <input id="goldPrice" type="number" step="0.01" placeholder="Fetching..." />
+
+      <div class="label">Gold Price - 2</div>
+      <input id="goldMinusTwo" type="number" step="0.01" readonly />
+
+      <div class="label">Onzas</div>
+      <input id="onzas" type="number" step="0.01" placeholder="Enter any number" />
+
+      <div class="btn-row">
+        <button id="fetchBtn" type="button">Fetch</button>
+        <button id="shareBtn" type="button">Share</button>
+      </div>
+    </div>
+
+    <!-- Hidden share area (captured to image) -->
+    <div id="shareCard" class="shareCard" aria-hidden="true">
+      <div id="shareText" class="shareText"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

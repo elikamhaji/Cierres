@@ -1,0 +1,75 @@
+body{
+  margin:0;
+  padding:0;
+  background:#0c0c0c;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  color:#fff;
+}
+.wrapper{
+  max-width:430px;
+  margin:auto;
+  padding:20px;
+}
+.card{
+  background:#141414;
+  padding:22px;
+  border-radius:26px;
+  box-shadow:0 0 45px rgba(0,0,0,0.4);
+}
+.label{
+  font-size:15px;
+  opacity:0.9;
+  margin-top:2px;
+}
+input{
+  width:100%;
+  margin:10px 0 18px;
+  padding:14px;
+  border:none;
+  border-radius:18px;
+  background:#1e1e1e;
+  color:#fff;
+  font-size:17px;
+  outline:none;
+}
+input[readonly]{
+  opacity:0.9;
+}
+.btn-row{
+  display:flex;
+  gap:10px;
+}
+button{
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:18px;
+  background:#2d4f81;
+  color:#fff;
+  font-size:16px;
+  font-weight:500;
+  cursor:pointer;
+}
+button:active{ transform: translateY(1px); }
+
+/* Share capture area */
+.shareCard{
+  position:absolute;
+  left:-9999px;
+  top:-9999px;
+  width:430px;
+  padding:26px;
+  border-radius:26px;
+  background:#141414;
+  box-shadow:0 0 45px rgba(0,0,0,0.4);
+}
+.shareText{
+  font-size:22px;
+  font-weight:600;
+  letter-spacing:0.2px;
+  line-height:1.25;
+  text-align:center;
+  padding:18px 10px;
+  border-radius:20px;
+  background:#1e1e1e;
+}
