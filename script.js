@@ -1,5 +1,5 @@
 const goldPriceEl = document.getElementById('goldPrice');
-const goldMinusTwoEl = document.getElementById('goldMinusTwo'); // actually minus-3
+const goldMinusEl = document.getElementById('goldMinusTwo');
 const onzasEl = document.getElementById('onzas');
 const fetchBtn = document.getElementById('fetchBtn');
 const shareBtn = document.getElementById('shareBtn');
@@ -23,13 +23,14 @@ function formatNYDateTime() {
   }).format(new Date());
 }
 
+// ---- PRICE LOGIC ----
 function updateMinusThree() {
   const gp = parseFloat(goldPriceEl.value);
   if (!isFinite(gp)) {
-    goldMinusTwoEl.value = '';
+    goldMinusEl.value = '';
     return;
   }
-  goldMinusTwoEl.value = round2(gp - 3).toFixed(2);
+  goldMinusEl.value = round2(gp - 3).toFixed(2);
 }
 
 goldPriceEl.addEventListener('input', updateMinusThree);
@@ -40,87 +41,55 @@ async function fetchPrice() {
   try {
     const res = await fetch('https://api.gold-api.com/price/XAU');
     const data = await res.json();
-    if (typeof data?.price === 'number') {
+    if (typeof data.price === 'number') {
       goldPriceEl.value = data.price.toFixed(2);
       updateMinusThree();
     }
   } catch (e) {
-    console.error('Fetch error:', e);
+    alert('Failed to fetch gold price');
   }
 }
 
-function buildShareData() {
-  const onzas = (onzasEl.value || '').trim();
-  const price = (goldMinusTwoEl.value || '').trim();
-  if (!onzas || !price) return null;
-
-  return {
-    line1: `${onzas} Onzas @ ${price}`,
-    line2: formatNYDateTime()
-  };
-}
-
-async function shareImage() {
-  const data = buildShareData();
-  if (!data) {
+// ---- SHARE IMAGE ----
+function shareImage() {
+  const onzas = onzasEl.value;
+  const price = goldMinusEl.value;
+  if (!onzas || !price) {
     alert('Enter Onzas and fetch price first.');
     return;
   }
 
-  // FORCE 2-LINE LAYOUT — NO WRAPPING
   shareText.innerHTML = `
-    <div style="
-      font-size:40px;
-      font-weight:700;
-      white-space:nowrap;
-      text-align:center;
-    ">
-      ${data.line1}
+    <div style="font-size:42px;font-weight:700;">
+      ${onzas} Onzas @ ${price}
     </div>
-    <div style="
-      font-size:22px;
-      opacity:0.85;
-      margin-top:12px;
-      text-align:center;
-    ">
-      ${data.line2}
+    <div style="font-size:22px;opacity:0.85;margin-top:14px;">
+      ${formatNYDateTime()}
     </div>
   `;
 
-  const canvas = await html2canvas(shareCard, {
-    scale: 3,
-    backgroundColor: '#141414'
-  });
+  html2canvas(shareCard, { scale: 3 }).then(canvas => {
+    canvas.toBlob(blob => {
+      const file = new File([blob], 'gold-share.png', { type: 'image/png' });
 
-  canvas.toBlob(async (blob) => {
-    if (!blob) return;
-
-    const file = new File([blob], 'gold-share.png', { type: 'image/png' });
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file] });
-    } else {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'gold-share.png';
-      link.click();
-    }
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file] });
+      } else {
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL();
+        a.download = 'gold-share.png';
+        a.click();
+      }
+    });
   });
 }
 
-// Auto fetch on load
-fetchPrice();
-
-// Calculator-style Onzas buttons
+// ---- ONZAS BUTTONS (append digits) ----
 document.querySelectorAll('.onzas-buttons button').forEach(btn => {
   btn.addEventListener('click', () => {
-    const action = btn.dataset.onzas;
-    let current = onzasEl.value || '';
-
-    if (action === 'back') {
-      onzasEl.value = current.slice(0, -1);
-    } else {
-      onzasEl.value = current + action;
-    }
+    onzasEl.value += btn.dataset.onzas;
   });
 });
+
+// Auto-fetch on load
+fetchPrice();
