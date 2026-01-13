@@ -1,5 +1,5 @@
 const goldPriceEl = document.getElementById('goldPrice');
-const goldMinusTwoEl = document.getElementById('goldMinusTwo'); // internal minus-3 value
+const goldMinusTwoEl = document.getElementById('goldMinusTwo'); // minus-3 value
 const onzasEl = document.getElementById('onzas');
 const fetchBtn = document.getElementById('fetchBtn');
 const shareBtn = document.getElementById('shareBtn');
@@ -12,7 +12,7 @@ function round2(n) {
 }
 
 function formatNYDateTime() {
-  const fmt = new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/New_York',
     year: 'numeric',
     month: '2-digit',
@@ -20,8 +20,7 @@ function formatNYDateTime() {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true
-  });
-  return fmt.format(new Date());
+  }).format(new Date());
 }
 
 function updateMinusThree() {
@@ -30,9 +29,7 @@ function updateMinusThree() {
     goldMinusTwoEl.value = '';
     return;
   }
-
-  const minusThree = round2(gp - 3);
-  goldMinusTwoEl.value = minusThree.toFixed(2);
+  goldMinusTwoEl.value = round2(gp - 3).toFixed(2);
 }
 
 goldPriceEl.addEventListener('input', updateMinusThree);
@@ -43,7 +40,6 @@ async function fetchPrice() {
   try {
     const res = await fetch('https://api.gold-api.com/price/XAU');
     const data = await res.json();
-
     if (typeof data?.price === 'number') {
       goldPriceEl.value = data.price.toFixed(2);
       updateMinusThree();
@@ -56,13 +52,11 @@ async function fetchPrice() {
 function buildShareData() {
   const onzas = (onzasEl.value || '').trim();
   const price = (goldMinusTwoEl.value || '').trim();
-  const ny = formatNYDateTime();
-
   if (!onzas || !price) return null;
 
   return {
     line1: `${onzas} Onzas @ ${price}`,
-    line2: ny
+    line2: formatNYDateTime()
   };
 }
 
@@ -73,12 +67,21 @@ async function shareImage() {
     return;
   }
 
-  // Two-line layout (clean + intentional)
+  // FORCE EXACTLY TWO LINES — NEVER WRAP LINE 1
   shareText.innerHTML = `
-    <div style="font-size:42px; font-weight:700; line-height:1.2;">
+    <div style="
+      font-size:40px;
+      font-weight:700;
+      line-height:1.2;
+      white-space:nowrap;
+    ">
       ${data.line1}
     </div>
-    <div style="font-size:22px; opacity:0.85; margin-top:12px;">
+    <div style="
+      font-size:22px;
+      opacity:0.85;
+      margin-top:14px;
+    ">
       ${data.line2}
     </div>
   `;
@@ -87,7 +90,6 @@ async function shareImage() {
 
   canvas.toBlob(async (blob) => {
     if (!blob) return;
-
     const file = new File([blob], 'gold-share.png', { type: 'image/png' });
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -101,20 +103,19 @@ async function shareImage() {
   });
 }
 
-// Auto-fetch on page load
+// Auto-fetch on load
 fetchPrice();
 
+/* Onzas keypad logic (calculator-style + backspace) */
 document.querySelectorAll('.onzas-buttons button').forEach(btn => {
   btn.addEventListener('click', () => {
-    const action = btn.dataset.onzas;
+    const val = btn.dataset.onzas;
     let current = onzasEl.value || '';
 
-    if (action === 'back') {
-      // Remove last digit
+    if (val === 'back') {
       onzasEl.value = current.slice(0, -1);
     } else {
-      // Append digit (calculator-style)
-      onzasEl.value = current + action;
+      onzasEl.value = current + val;
     }
   });
 });
