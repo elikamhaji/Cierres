@@ -65,6 +65,24 @@ button:active{ transform: translateY(1px); }
   background:#141414;
   box-shadow:0 0 45px rgba(0,0,0,0.4);
 }
+
+.shareTop {
+  font-size: 36px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 14px;
+  white-space: nowrap;     /* prevents extra wrapping */
+}
+
+.shareBottom {
+  font-size: 22px;
+  opacity: 0.85;
+  text-align: center;
+  white-space: nowrap;
+}
+
+
 .shareText{
   font-size:22px;
   font-weight:600;
